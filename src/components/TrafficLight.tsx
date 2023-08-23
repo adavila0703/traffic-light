@@ -23,27 +23,36 @@ const lights = {
   },
 };
 
-export interface TrafficLightPorps {
+interface TrafficLightPorps {
   horizontal?: boolean;
 }
 
 export const TrafficLight = ({ horizontal }: TrafficLightPorps) => {
-  const [nextLight, setNextLight] = useState(lights.green);
-  const [currentLight, setCurrentLight] = useState(lights.red);
+  const [lightSettings, setLightSettings] = useState({
+    nextLight: lights.green,
+    currentLight: lights.red,
+  });
   const [timer, setTimer] = useState(0);
 
   const getNextLight = () => {
-    switch (currentLight.light) {
+    switch (lightSettings.currentLight.light) {
       case LightColor.RED:
-        setCurrentLight(lights.yellow);
-        setNextLight(lights.green);
+        setLightSettings({
+          nextLight: lights.green,
+          currentLight: lights.yellow,
+        });
         break;
       case LightColor.YELLOW:
-        setCurrentLight(nextLight);
+        setLightSettings({
+          ...lightSettings,
+          currentLight: lightSettings.nextLight,
+        });
         break;
       case LightColor.GREEN:
-        setCurrentLight(lights.yellow);
-        setNextLight(lights.red);
+        setLightSettings({
+          nextLight: lights.red,
+          currentLight: lights.yellow,
+        });
         break;
     }
   };
@@ -52,7 +61,7 @@ export const TrafficLight = ({ horizontal }: TrafficLightPorps) => {
     const interval = setInterval(() => {
       setTimer(timer + 1);
 
-      if (timer >= currentLight.time) {
+      if (timer >= lightSettings.currentLight.time) {
         getNextLight();
         setTimer(0);
       }
@@ -67,15 +76,25 @@ export const TrafficLight = ({ horizontal }: TrafficLightPorps) => {
         style={{ transform: horizontal ? 'rotate(270deg)' : '' }}
       >
         <Light
-          color={currentLight.light === LightColor.RED ? 'red' : undefined}
-        />
-        <Light
           color={
-            currentLight.light === LightColor.YELLOW ? 'yellow' : undefined
+            lightSettings.currentLight.light === LightColor.RED
+              ? 'red'
+              : undefined
           }
         />
         <Light
-          color={currentLight.light === LightColor.GREEN ? 'green' : undefined}
+          color={
+            lightSettings.currentLight.light === LightColor.YELLOW
+              ? 'yellow'
+              : undefined
+          }
+        />
+        <Light
+          color={
+            lightSettings.currentLight.light === LightColor.GREEN
+              ? 'green'
+              : undefined
+          }
         />
       </div>
     </div>
